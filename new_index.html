@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>bz</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <header>
+        <nav class="group">
+            <a href="mailto:zhang.baozhe2000@gmail.com">Email</a> &nbsp/&nbsp
+            <a href="data/baozhe_zhang_resume.pdf">CV</a> &nbsp/&nbsp
+            <a href="https://scholar.google.com/citations?user=L7o6M0UAAAAJ">Google Scholar</a> &nbsp/&nbsp
+            <a href="https://twitter.com/baozhezhang">Twitter</a> &nbsp/&nbsp
+            <a href="https://github.com/zhangbaozhe/">Github</a> &nbsp/&nbsp
+            <a href="https://zhangbaozhe.github.io/blog/">Blog</a>
+        </nav>
+    </header>
+    <article>
+        <h1>
+            Baozhe Zhang 张宝哲
+
+        </h1>
+        <section id="introduction">
+            <p>
+                Hi, I am Baozhe.
+                <label for="me_photo" class="margin-toggle">&#8853;</label>
+                <input type="checkbox" id="me_photo" class="margin-toggle" />
+                <span class="marginnote">
+                    <img src="images/me.jpg" />
+                </span>
+                I am now a research assistant at <a href="http://zju-fast.com/">FAST Lab</a>. I received my B.E. in
+                computer engineering from <a href="https://www.cuhk.edu.cn/en">The Chinese University of Hong Kong,
+                    Shenzhen</a> in 2024.
+                I am interested in robotics, especially in aerial robots. I am also interested in motion planning,
+                advanced control,and integrating machine learning methods into classical robot working pipelines. I love
+                C++ and am
+                open to new technologies.
+            </p>
+        </section>
+        <section id="research">
+            <h2>Research Interests</h2>
+            <table id="resaerch_interests" style="font-size: 1.4rem;">
+                <tbody>
+                    <tr>
+                        <td style="vertical-align: middle; width: 25%; line-height: 1.5;">
+                            <b>Real-time Robotics Algorithms</b>
+                        </td>
+                        <td style="vertical-align: middle; width: 75%; line-height: 1.5;">
+                            Developing algorithms in C++
+                            and Python for execution on edge computational platforms such as Nvidia Orin NX, focusing on
+                            real-time efficiency with limited resources.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: middle; width: 25%; line-height: 1.5;">
+                            <b>Multi-robot System Collaboration and Intelligence</b>
+                        </td>
+                        <td style="vertical-align: middle; width: 75%; line-height: 1.5;">
+                            Designing protocols for
+                            multi-robot systems to achieve cooperative tasks in logistics and manipulation with an
+                            emphasis on synchronization and shared objectives.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: middle; width: 25%; line-height: 1.5;">
+                            <b>Robot Motion Planning</b>
+                        </td>
+                        <td style="vertical-align: middle; width: 75%; line-height: 1.5;">
+                            Advancing motion planning
+                            techniques for precise navigation and task execution in cluttered environments, utilizing
+                            principles of optimization and learning for movement efficiency.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: middle; width: 25%; line-height: 1.5;">
+                            <b>Reinforcement Learning for Robotics</b>
+                        </td>
+                        <td style="vertical-align: middle; width: 75%; line-height: 1.5;">
+                            Implementing reinforcement
+                            learning system to enhance robots' adaptive capabilities for improved autonomy in diverse
+                            operational scenarios.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: middle; width: 25%; line-height: 1.5;">
+                            <b>Robot Cinematography</b>
+                        </td>
+                        <td style="vertical-align: middle; width: 75%; line-height: 1.5;">
+                            Implementing algorithms and systems for robots to understand scenes in cinematography
+                            pipelines
+                            achieving autonomous filming in social environments.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="publication">Publication</h2>
+            <table id="publication" style="font-size: 1.4rem;">
+                <tbody>
+                    <tr onmouseout="coni_mpc_stop()" onmouseover="coni_mpc_start()">
+                        <td style="vertical-align: middle; width: auto; line-height: 1.5;">
+                            <a href="https://fast-fire.github.io/CoNi-MPC/">
+                                CoNi-MPC: Cooperative Non-inertial Frame Based Model Predictive Control
+                            </a>
+                            <label for="coni_mpc_media" class="margin-toggle">&#8853;</label>
+                            <input type="checkbox" id="coni_mpc_media" class="margin-toggle" />
+                            <span class="marginnote" >
+                                <div class="one">
+                                    <div class="two" id='coni_mpc_image'><video width=100% height=100% muted autoplay
+                                            loop>
+                                            <source src="images/coni_mpc.mp4" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video></div>
+                                    <img src='images/coni_mpc.png' width="200px">
+                                </div>
+                                <script type="text/javascript">
+                                    function coni_mpc_start() {
+                                        document.getElementById('coni_mpc_image').style.opacity = "1";
+                                    }
+
+                                    function coni_mpc_stop() {
+                                        document.getElementById('coni_mpc_image').style.opacity = "0";
+                                    }
+                                    coni_mpc_stop()
+                                </script>
+                            </span>
+                            <strong>Baozhe Zhang</strong><sup>*</sup>
+                            Xinwei Chen<sup>*</sup>,
+                            Zhehan Li,
+                            <a href="https://mistlab.ca/people/beltrame/">Giovanni Beltrame</a>,
+                            <a href="http://zju-fast.com/research-group/chao-xu/">Chao Xu</a>,
+                            <a href="http://zju-fast.com/fei-gao/">Fei Gao</a>,
+                            <a href="http://zju-fast.com/research-group/yanjun-cao/">Yanjun Cao</a>
+                            <br>
+                            <em>RA-L</em>, 2023 (Presented at ICRA 2024)
+                            <br>
+                            <a href="https://fast-fire.github.io/CoNi-MPC/">project page</a>
+                            /
+                            <a href="https://www.bilibili.com/video/BV1iX4y1s7e6">video</a>
+                            /
+                            <a href="https://arxiv.org/abs/2306.11259">arXiv</a>
+                            <p></p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Useful ROS Tips</title>
+    <link rel="stylesheet" href="../style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <header>
+        <nav class="group">
+            <a href="mailto:zhang.baozhe2000@gmail.com">Email</a> &nbsp/&nbsp
+            <a href="data/baozhe_zhang_resume.pdf">CV</a> &nbsp/&nbsp
+            <a href="https://scholar.google.com/citations?user=L7o6M0UAAAAJ">Google Scholar</a> &nbsp/&nbsp
+            <a href="https://twitter.com/baozhezhang">Twitter</a> &nbsp/&nbsp
+            <a href="https://github.com/zhangbaozhe/">Github</a> &nbsp/&nbsp
+            <a href="./blog.html">Blog</a> &nbsp/&nbsp
+            <a href="../index.html">me</a>
+        </nav>
+    </header>
+
+    <article>
+        <h1>Useful ROS Tips</h1>
+        <p class="subtitle">Posted on 2023-11-14</p>
+
+        <section>
+            <p>
+                I've been extensively writing C++ code with ROS1 for about a year. Here are some tips I find that might
+                help your development.
+            </p>
+
+            <h2>
+                Use additional callback queues
+            </h2>
+            <p>
+                Sometimes you have a very important message that you do want to process it as fast as possible.
+            </p>
+
+            <pre>
+                <code>
+ros::NodeHandle nh;
+ros::CallbackQueue cq;
+nh.setCallbackQueue(&cq);
+ros::Subscriber sub = nh.subscribe<std_msgs::String>("msg", 1, 
+    [&](const std_msgs::String::ConstPtr &msg){ /* do something*/ });
+ros::spin();
+                </code>
+            </pre>
+            
+            <p>
+                Usually, if you do not set an additional callback queue, ROS will set a global callback queue for every
+                message you subscribe in your node. This can be disrupting for your application if you have some VIP
+                messages need to process.
+            </p>
+
+            <h2>
+                Leave heavy tasks out of callbacks
+            </h2>
+            <p>
+                Callbacks are executed when messages come to a node. If one callback has to be processed with a long
+                time (and assuming you are using a global callback queue), then with great possibility that your other
+                messages will be stuck. My practice for callbacks is that I will let the callbacks always perform copy
+                tasks and leave the main logic in main loop or some worker threads.
+            </p>
+
+            <h2>
+                Thread safety
+            </h2>
+            <p>
+                ROS guarantees that callbacks are thread safe. However, a user-customized thread is not thread safe with
+                a ROS callback. That is, if there are read-and-write operations performed at the same time in the two
+                threads, you may need to add locks or mutexes.
+            </p>
+        </section>
+    </article>
+</body>

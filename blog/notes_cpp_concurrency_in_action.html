@@ -27,17 +27,104 @@
         </h1>
         <p class="subtitle">darft version</p>
 
-        <section>
+        <section id="main_text">
             <p>
                 This book <em>C++ Concurrency in Action</em> by Anthony Williams is a great book about C++
                 multithreading that I started reading about two years ago. Finally, I can write some reading notes about
-                it ;) C++ multithreading programming is a huge pain for me as a robotics researcher and software engineer. All we
+                it ;) C++ multithreading programming is a huge pain for me as a robotics researcher and software
+                engineer. All we
                 robotics software engineers try to let the computing platform exploit its full potentials, e.g., let our
                 algorithms run in parallel. However, parallelism comes with a price of mental stress, especially when
                 you do programming in C++.
 
                 In this blog post, I will record some of the key ideas from the book and add some coding examples.
             </p>
+
+            <h2>Shared data and race condition</h2>
+
+            <p>
+                Although the whole purpose of the multithreading programming is to enhance concurrency and data
+                parallelism, programmers have to pay attention to the race condition of the shared data. For example, in
+                the following code
+            </p>
+            <pre><code>
+int i = 0;
+auto add = [&i] {
+    for (size_t num = 0; num < 100; num++)
+    i++;
+};
+std::thread t1(add); std::thread t2(add);
+t1.join(); t2.join();
+            </code></pre>
+            <p>
+                you launched two threads expecting the shared variable <code>i</code> to be 200, but it's not. Due to
+                the memory order and cache coherency problem, when you expecting that <code>t1</code> adding 1 to the
+                assumed latest <code>i</code>, that <code>i</code> in <code>t1</code> may not be the "latest" as the
+                content in the memory is not updated. Besides, the above example is an undefined behavior in C++. So
+                there's a race condition and we need synchronization or enforcing read-write order. There are two ways:
+            </p>
+            <ol>
+                <li>
+                    Lock-based (easy, OS-level): using <code>std::mutex</code> related mutual exclusive on the critical
+                    part to let the code run in serial, i.e., when one thread acquiring the lock, other threads wait for
+                    it to be released (and begging they can acquire due to some magical scheduling)
+                </li>
+                <li>
+                    Lock-free (hard, processor-level): making sure the reading and writing operations are in the
+                    expected order. The simplest method for the above example is to use
+                    <code>std::atomic&lt;int&gt;</code> which guarantees the memory order (see <a
+                        href="https://en.cppreference.com/w/cpp/atomic/atomic">cppreference</a>)
+                </li>
+            </ol>
+            <p>
+                For general data structures in multithreading, the lock-based methods are usually easier to implement
+                and make sure its correctness.
+            </p>
+
+            <h2>Thread-safe data structures</h2>
+            <p>TL;DR: More (fine-grained) locks &rightarrow; more parallelism</p>
+
+            <p>
+                When sharing data among threads, it might be easy to synchronize data with the type of
+                <code>int</code>. However, if you have a stack or queue that want to be shared and you want to full
+                control of the parallelism of these types. You may consider building your own "thread-safe" types. For
+                these kind of big data, usually
+            </p>
+            <blockquote>
+                <p>
+                    the smaller the protected region, the fewer operations are serialized, and the greater the potential
+                    for
+                    concurrency
+                </p>
+            </blockquote>
+            <p>
+                For example, if you use the STL queue and mutex,
+            </p>
+            <pre><code>
+{ // thread 1
+    std::lock_guard<std::mutex> lk(_mtx);
+    queue.push(T);
+}
+{ // thread2
+    std::lock_guard<std::mutex> lk(_mtx);
+    queue.pop(T);
+}
+            </code></pre>
+            <p>
+                you are increasing the time of the serialization, but actually the push and pop operations won't affect
+                each other's data (e.g., head or tail). So in this section, I'll copy some of the simple classic
+                thread-safe types for reference.
+            </p>
+
+            <h3>Thread-safe <code>stack</code></h3>
+
+            <h3>Thread-safe <code>queue</code></h3>
+            <h3>Thread-safe <code>list</code></h3>
+            <h3>Thread-safe <code>map</code></h3>
+
+            <h2>Programming asynchronously in C++</h2>
+
+
         </section>
     </article>
 </body>

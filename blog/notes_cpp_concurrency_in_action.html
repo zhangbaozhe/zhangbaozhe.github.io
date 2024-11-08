@@ -50,7 +50,7 @@
             <pre><code>
 int i = 0;
 auto add = [&i] {
-    for (size_t num = 0; num < 100; num++)
+    for (size_t num = 0; num &lt; 100; num++)
     i++;
 };
 std::thread t1(add); std::thread t2(add);
@@ -82,7 +82,7 @@ t1.join(); t2.join();
             </p>
 
             <h2>Thread-safe data structures</h2>
-            <p>TL;DR: More (fine-grained) locks &rightarrow; more parallelism</p>
+            <p>TL; DR: More (fine-grained) locks &rightarrow; more parallelism</p>
 
             <p>
                 When sharing data among threads, it might be easy to synchronize data with the type of
@@ -102,27 +102,339 @@ t1.join(); t2.join();
             </p>
             <pre><code>
 { // thread 1
-    std::lock_guard<std::mutex> lk(_mtx);
+    std::lock_guard&lt;std::mutex&gt; lk(_mtx);
     queue.push(T);
 }
 { // thread2
-    std::lock_guard<std::mutex> lk(_mtx);
+    std::lock_guard&lt;std::mutex&gt; lk(_mtx);
     queue.pop(T);
 }
             </code></pre>
             <p>
-                you are increasing the time of the serialization, but actually the push and pop operations won't affect
+                you are increasing the time of the serialization (or high contention), but actually the push and pop operations won't affect
                 each other's data (e.g., head or tail). So in this section, I'll copy some of the simple classic
-                thread-safe types for reference.
+                thread-safe containers in the <a href="#thread_safe_containers">appendix</a> for reference.
             </p>
 
+            <h2 id="thread_safe_containers">Appendix: Thread-safe containers</h2>
             <h3>Thread-safe <code>stack</code></h3>
+            <pre><code>
+template &lt;typename T&gt; class Stack {
+private:
+  struct Node {
+    std::shared_ptr&lt;T&gt; data;
+    std::unique_ptr&lt;Node&gt; next;
+  }; // struct Node
+  std::unique_ptr&lt;Node&gt; _head;
+  std::mutex _head_mutex;
+  // Pop head function to remove the head node safely
+  std::unique_ptr&lt;Node&gt; pop_head() {
+    std::lock_guard&lt;std::mutex&gt; head_lock(_head_mutex);
+    if (!_head) {
+      return nullptr; // Stack is empty
+    }
+    std::unique_ptr&lt;Node&gt; old_head = std::move(_head);
+    _head = std::move(old_head-&gt;next);
+    return old_head;
+  }
+public:
+  Stack() = default;
+  Stack(const Stack &) = delete;
+  Stack &operator=(const Stack &) = delete;
+  // Function to pop an element from the stack
+  std::shared_ptr&lt;T&gt; try_pop() {
+    std::unique_ptr&lt;Node&gt; old_head = pop_head();
+    return old_head ? old_head-&gt;data : std::shared_ptr&lt;T&gt;();
+  }
+  // Function to push an element onto the stack
+  void push(T new_value) {
+    std::shared_ptr&lt;T&gt; new_data(std::make_shared&lt;T&gt;(std::move(new_value)));
+    std::unique_ptr&lt;Node&gt; new_node(new Node{new_data, nullptr});
+
+    std::lock_guard&lt;std::mutex&gt; head_lock(_head_mutex);
+    new_node-&gt;next = std::move(_head);
+    _head = std::move(new_node);
+  }
+}; // class Stack
+            </code></pre>
 
             <h3>Thread-safe <code>queue</code></h3>
+            <pre><code>
+template &lt;typename T&gt; class Queue {
+private:
+  struct Node {
+    std::shared_ptr&lt;T&gt; data;
+    std::unique_ptr&lt;Node&gt; next;
+  }; // struct Node
+  std::mutex _head_mutex;
+  std::unique_ptr&lt;Node&gt; _head;
+  std::mutex _tail_mutex;
+  Node *_tail;
+  std::condition_variable _data_cond;
+  Node *get_tail() {
+    std::lock_guard&lt;std::mutex&gt; tail_lock(_tail_mutex);
+    return _tail;
+  }
+  std::unique_ptr&lt;Node&gt; pop_head() {
+    std::unique_ptr&lt;Node&gt; old_head = std::move(_head);
+    _head = std::move(old_head-&gt;next);
+    return old_head;
+  }
+  std::unique_lock&lt;std::mutex&gt; wait_for_data() {
+    std::unique_lock&lt;std::mutex&gt; head_lock(_head_mutex);
+    _data_cond.wait(head_lock, [&] { return _head.get() != get_tail(); });
+    return std::move(head_lock);
+  }
+  std::unique_ptr&lt;Node&gt; wait_pop_head() {
+    std::unique_lock&lt;std::mutex&gt; head_lock(wait_for_data());
+    return pop_head();
+  }
+  std::unique_ptr&lt;Node&gt; try_pop_head() {
+    std::lock_guard&lt;std::mutex&gt; head_lock(_head_mutex);
+    if (_head.get() == get_tail()) {
+      return std::unique_ptr&lt;Node&gt;();
+    }
+    return pop_head();
+  }
+public:
+  Queue() : _head(new Node), _tail(_head.get()) {}
+  Queue(const Queue &) = delete;
+  Queue &operator=(const Queue &) = delete;
+  bool empty() {
+    std::lock_guard&lt;std::mutex&gt; head_lock(_head_mutex);
+    return (_head.get() == get_tail());
+  }
+  std::shared_ptr&lt;T&gt; try_pop() {
+    std::unique_ptr&lt;Node&gt; old_head = try_pop_head();
+    return old_head != nullptr ? old_head-&gt;data : std::shared_ptr&lt;T&gt;();
+  }
+  std::shared_ptr&lt;T&gt; wait_and_pop() {
+    std::unique_ptr&lt;Node&gt; old_head = wait_pop_head();
+    return old_head-&gt;data;
+  }
+  void push(T new_value) {
+    std::shared_ptr&lt;T&gt; new_data(std::make_shared&lt;T&gt;(std::move(new_value)));
+    std::unique_ptr&lt;Node&gt; p(new Node);
+    Node *new_tail = p.get();
+    {
+      std::lock_guard&lt;std::mutex&gt; tail_lock(_tail_mutex);
+      _tail-&gt;data = new_data;
+      _tail-&gt;next = std::move(p);
+      _tail = new_tail;
+    }
+    _data_cond.notify_one();
+  }
+}; // class Queue
+            </code></pre>
             <h3>Thread-safe <code>list</code></h3>
-            <h3>Thread-safe <code>map</code></h3>
+            <pre><code>
+template &lt;typename T&gt; class List {
+  struct Node {
+    std::mutex m;
+    std::shared_ptr&lt;T&gt; data;
+    std::unique_ptr&lt;Node&gt; next;
+    Node() : next() {}
+    Node(const T &value) : data(std::make_shared&lt;T&gt;(value)) {}
+  }; // struct Node
+  Node _head;
 
-            <h2>Programming asynchronously in C++</h2>
+public:
+  List() {}
+  ~List() {
+    remove_if([](const Node &) { return true; });
+  }
+  List(const List &) = delete;
+  List &operator=(const List &) = delete;
+
+  void push_front(const T &value) {
+    std::unique_ptr&lt;Node&gt; new_node(new Node(value));
+    std::lock_guard&lt;std::mutex&gt; lk(_head.m);
+    new_node-&gt;next = std::move(_head.next);
+    _head.next = std::move(new_node);
+  }
+  template &lt;typename F&gt; void for_each(F f) {
+    Node *current = &_head;
+    std::unique_lock&lt;std::mutex&gt; lk(_head.m);
+    while (Node *const next = current-&gt;next.get()) {
+      std::unique_lock&lt;std::mutex&gt; next_lk(next-&gt;m);
+      lk.unlock();
+      f(*next-&gt;data);
+      current = next;
+      lk = std::move(next_lk); // lk has bigger scope
+    }
+  }
+  template &lt;typename Pred&gt; std::shared_ptr&lt;T&gt; find_first_if(Pred p) {
+    Node *current = &_head;
+    std::unique_lock&lt;std::mutex&gt; lk(_head.m);
+    while (Node *const next = current-&gt;next.get()) {
+      std::unique_lock&lt;std::mutex&gt; next_lk(next-&gt;m);
+      lk.unlock();
+      if (p(*next-&gt;data)) {
+        return next-&gt;data;
+      }
+      current = next;
+      lk = std::move(next_lk);
+    }
+    return std::shared_ptr&lt;T&gt;();
+  }
+  template &lt;typename Pred&gt; void remove_if(Pred p) {
+    Node *current = &_head;
+    std::unique_lock&lt;std::mutex&gt; lk(_head.m);
+    while (Node *const next = current-&gt;next.get()) {
+      std::unique_lock&lt;std::mutex&gt; next_lk(next-&gt;m);
+      if (p(*next-&gt;data)) {
+        std::unique_ptr&lt;Node&gt; old_next = std::move(current-&gt;next);
+        current-&gt;next = std::move(next-&gt;next);
+        next_lk.unlock();
+      } else {
+        lk.unlock();
+        current = next;
+        lk = std::move(next_lk);
+      }
+    }
+  }
+}; // class List
+            </code></pre>
+            <h3>Thread-safe <code>map</code></h3>
+            
+                   
+              
+            <pre><code>
+  template &lt;typename Key, typename Value, typename Hash = std::hash&lt;Key&gt;&gt;
+  class Map {
+  private:
+    class Bucket {
+    private:
+      using BucketValue = std::pair&lt;Key, Value&gt;;
+      List&lt;BucketValue&gt; _data; // List as in the above code
+    public:
+      Value value_for(const Key &key, const Value &default_value) {
+        auto found_entry = _data.find_first_if(
+            [&](const BucketValue &item) { return item.first == key; });
+        return found_entry ? *found_entry : default_value;
+      }
+      void add_or_update_mapping(const Key &key, const Value &value) {
+        auto found_entry = _data.find_first_if(
+            [&](const BucketValue &item) { return item.first == key; });
+        if (found_entry) {
+          found_entry-&gt;second = value;
+        } else {
+          _data.push_front(BucketValue(key, value));
+        }
+      }
+      void remove_mapping(const Key &key) {
+        _data.remove_if(
+            [&](const BucketValue &item) { return item.first == key; });
+      }
+    }; // class Bucket
+    std::vector&lt;std::unique_ptr&lt;Bucket&gt;&gt; _buckets;
+    Hash _hasher;
+  
+    Bucket &get_bucket(const Key &key) {
+      const std::size_t bucket_index = _hasher(key) % _buckets.size();
+      return *_buckets[bucket_index];
+    }
+  public:
+    using key_type = Key;
+    using mapped_type = Value;
+    using hash_type = Hash;
+  
+    Map(size_t num_buckets = 19, const Hash &hasher = Hash())
+        : _buckets(num_buckets), _hasher(hasher) {
+      for (size_t i = 0; i &lt; num_buckets; ++i) {
+        _buckets[i] = std::make_unique&lt;Bucket&gt;();
+      }
+    }
+    Map(const Map &) = delete;
+    Map &operator=(const Map &) = delete;
+    Value value_for(const Key &key, const Value &default_value = Value()) const {
+      return get_bucket(key).value_for(key, default_value);
+    }
+    void add_or_update_mapping(const Key &key, const Value &value) {
+      get_bucket(key).add_or_update_mapping(key, value);
+    }
+    void remove_mapping(const Key &key) { get_bucket(key).remove_mapping(key); }
+  }; // class Map 
+            </code></pre>
+
+            <p>
+              There's a version that you can use the STL's list if you don't have a thread-safe queue.
+            </p>
+
+            <pre><code>
+template &lt;typename Key, typename Value, typename Hash = std::hash&lt;Key&gt;&gt;
+class _Map {
+private:
+  class Bucket {
+  private:
+    using BucketValue = std::pair&lt;Key, Value&gt;;
+    using BucketData = std::list&lt;BucketValue&gt;; // uses STL list
+    using BucketIterator = typename BucketData::iterator;
+    BucketData _data;
+    mutable std::shared_mutex _mutex;
+
+    BucketIterator find_entry_for(const Key &key) {
+      return std::find_if(
+          _data.begin(), _data.end(),
+          [&](const BucketValue &item) { return item.first == key; });
+    }
+
+  public:
+    Value value_for(const Key &key, const Value &default_value) {
+      std::shared_lock&lt;std::shared_mutex&gt; lock(_mutex);
+      const BucketIterator found_entry = find_entry_for(key);
+      return (found_entry == _data.end()) ? default_value : found_entry-&gt;second;
+    }
+    void add_or_update_mapping(const Key &key, const Value &value) {
+      std::unique_lock&lt;std::shared_mutex&gt; lock(_mutex);
+      const BucketIterator found_entry = find_entry_for(key);
+      if (found_entry == _data.end()) {
+        _data.push_back(BucketValue(key, value));
+      } else {
+        found_entry-&gt;second = value;
+      }
+    }
+    void remove_mapping(const Key &key) {
+      std::unique_lock&lt;std::shared_mutex&gt; lock(_mutex);
+      const BucketIterator found_entry = find_entry_for(key);
+      if (found_entry != _data.end()) {
+        _data.erase(found_entry);
+      }
+    }
+  }; // class Bucket
+  std::vector&lt;std::unique_ptr&lt;Bucket&gt;&gt; _buckets;
+  Hash _hasher;
+  Bucket &get_bucket(const Key &key) const {
+    const std::size_t bucket_index = _hasher(key) % _buckets.size();
+    return *_buckets[bucket_index];
+  }
+
+public:
+  using key_type = Key;
+  using mapped_type = Value;
+  using hash_type = Hash;
+
+  _Map(size_t num_buckets = 19, const Hash &hasher = Hash())
+      : _buckets(num_buckets), _hasher(hasher) {
+    for (size_t i = 0; i &lt; num_buckets; ++i) {
+      _buckets[i].reset(new Bucket);
+    }
+  }
+
+  _Map(const _Map &) = delete;
+  _Map &operator=(const _Map &) = delete;
+
+  Value value_for(const Key &key, const Value &default_value = Value()) const {
+    return get_bucket(key).value_for(key, default_value);
+  }
+  void add_or_update_mapping(const Key &key, const Value &value) {
+    get_bucket(key).add_or_update_mapping(key, value);
+  }
+  void remove_mapping(const Key &key) { get_bucket(key).remove_mapping(key); }
+}; // class _Map
+            </code></pre>
+            
+
 
 
         </section>

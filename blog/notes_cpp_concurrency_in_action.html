@@ -3,9 +3,38 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Course Notes: CS184 Computer Graphics</title>
+    <title>Reading notes: C++ concurrency in action</title>
     <link rel="stylesheet" href="../style.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
+        media="(prefers-color-scheme: light)" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+        media="(prefers-color-scheme: dark)" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script>
+        const themeLink = document.querySelector("link[rel='stylesheet'][href*='highlight.js']");
+        function updateTheme(e) {
+            const prefersDarkScheme = e.matches;
+            if (prefersDarkScheme) {
+                themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css');
+            } else {
+                themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css');
+            }
+        }
+        // Detect initial theme preference
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        updateTheme(prefersDarkScheme);
+        // Listen for theme changes
+        prefersDarkScheme.addEventListener('change', updateTheme);
+    </script>
+    <style>
+        .hljs {
+            background-color: transparent !important; /* Makes the code block background match the body */
+        }
+    </style>
 </head>
 
 <body>
@@ -111,7 +140,8 @@ t1.join(); t2.join();
 }
             </code></pre>
             <p>
-                you are increasing the time of the serialization (or high contention), but actually the push and pop operations won't affect
+                you are increasing the time of the serialization (or high contention), but actually the push and pop
+                operations won't affect
                 each other's data (e.g., head or tail). So in this section, I'll copy some of the simple classic
                 thread-safe containers in the <a href="#thread_safe_containers">appendix</a> for reference.
             </p>
@@ -296,9 +326,9 @@ public:
 }; // class List
             </code></pre>
             <h3>Thread-safe <code>map</code></h3>
-            
-                   
-              
+
+
+
             <pre><code>
   template &lt;typename Key, typename Value, typename Hash = std::hash&lt;Key&gt;&gt;
   class Map {
@@ -358,7 +388,7 @@ public:
             </code></pre>
 
             <p>
-              There's a version that you can use the STL's list if you don't have a thread-safe queue.
+                There's a version that you can use the STL's list if you don't have a thread-safe queue.
             </p>
 
             <pre><code>
@@ -433,7 +463,7 @@ public:
   void remove_mapping(const Key &key) { get_bucket(key).remove_mapping(key); }
 }; // class _Map
             </code></pre>
-            
+
 
 
 

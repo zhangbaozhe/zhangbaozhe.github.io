@@ -1,82 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <title>Reading notes: C++ concurrency in action</title>
     <link rel="stylesheet" href="../style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
-        media="(prefers-color-scheme: light)" />
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
-        media="(prefers-color-scheme: dark)" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+      media="(prefers-color-scheme: dark)"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
-    <script>
-        const themeLink = document.querySelector("link[rel='stylesheet'][href*='highlight.js']");
-        function updateTheme(e) {
-            const prefersDarkScheme = e.matches;
-            if (prefersDarkScheme) {
-                themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css');
-            } else {
-                themeLink.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css');
-            }
-        }
-        // Detect initial theme preference
-        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-        updateTheme(prefersDarkScheme);
-        // Listen for theme changes
-        prefersDarkScheme.addEventListener('change', updateTheme);
-    </script>
-    <style>
-        .hljs {
-            background-color: transparent !important; /* Makes the code block background match the body */
-        }
-    </style>
-</head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  </head>
 
-<body>
+  <body>
     <header>
-        <nav class="group">
-            <a href="mailto:zhang.baozhe2000@gmail.com">Email</a> &nbsp/&nbsp
-            <a href="../data/baozhe_zhang_resume.pdf">CV</a> &nbsp/&nbsp
-            <a href="https://scholar.google.com/citations?user=L7o6M0UAAAAJ">Google Scholar</a> &nbsp/&nbsp
-            <a href="https://twitter.com/baozhezhang">Twitter</a> &nbsp/&nbsp
-            <a href="https://github.com/zhangbaozhe/">Github</a> &nbsp/&nbsp
-            <a href="./blog.html">Blog</a> &nbsp/&nbsp
-            <a href="../index.html">me</a>
-        </nav>
+      <nav class="group">
+        <a href="mailto:zhang.baozhe2000@gmail.com">Email</a> &nbsp/&nbsp
+        <a href="../data/baozhe_zhang_resume.pdf">CV</a> &nbsp/&nbsp
+        <a href="https://scholar.google.com/citations?user=L7o6M0UAAAAJ"
+          >Google Scholar</a
+        >
+        &nbsp/&nbsp
+        <a href="https://twitter.com/baozhezhang">Twitter</a> &nbsp/&nbsp
+        <a href="https://github.com/zhangbaozhe/">Github</a> &nbsp/&nbsp
+        <a href="./blog.html">Blog</a> &nbsp/&nbsp
+        <a href="../index.html">me</a>
+      </nav>
     </header>
 
     <article>
-        <h1>
-            Reading Notes: C++ Concurrency in Action
-        </h1>
-        <p class="subtitle">darft version</p>
+      <h1>Reading Notes: C++ Concurrency in Action</h1>
+      <p class="subtitle">darft version</p>
 
-        <section id="main_text">
-            <p>
-                This book <em>C++ Concurrency in Action</em> by Anthony Williams is a great book about C++
-                multithreading that I started reading about two years ago. Finally, I can write some reading notes about
-                it ;) C++ multithreading programming is a huge pain for me as a robotics researcher and software
-                engineer. All we
-                robotics software engineers try to let the computing platform exploit its full potentials, e.g., let our
-                algorithms run in parallel. However, parallelism comes with a price of mental stress, especially when
-                you do programming in C++.
+      <section id="main_text">
+        <p>
+          This book <em>C++ Concurrency in Action</em> by Anthony Williams is a
+          great book about C++ multithreading that I started reading about two
+          years ago. Finally, I can write some reading notes about it ;) C++
+          multithreading programming is a huge pain for me as a robotics
+          researcher and software engineer. All we robotics software engineers
+          try to let the computing platform exploit its full potentials, e.g.,
+          let our algorithms run in parallel. However, parallelism comes with a
+          price of mental stress, especially when you do programming in C++. In
+          this blog post, I will record some of the key ideas from the book and
+          add some coding examples.
+        </p>
 
-                In this blog post, I will record some of the key ideas from the book and add some coding examples.
-            </p>
+        <h2>Shared data and race condition</h2>
 
-            <h2>Shared data and race condition</h2>
-
-            <p>
-                Although the whole purpose of the multithreading programming is to enhance concurrency and data
-                parallelism, programmers have to pay attention to the race condition of the shared data. For example, in
-                the following code
-            </p>
-            <pre><code>
+        <p>
+          Although the whole purpose of the multithreading programming is to
+          enhance concurrency and data parallelism, programmers have to pay
+          attention to the race condition of the shared data. For example, in
+          the following code
+        </p>
+        <pre><code>
 int i = 0;
 auto add = [&i] {
     for (size_t num = 0; num &lt; 100; num++)
@@ -85,51 +70,59 @@ auto add = [&i] {
 std::thread t1(add); std::thread t2(add);
 t1.join(); t2.join();
             </code></pre>
-            <p>
-                you launched two threads expecting the shared variable <code>i</code> to be 200, but it's not. Due to
-                the memory order and cache coherency problem, when you expecting that <code>t1</code> adding 1 to the
-                assumed latest <code>i</code>, that <code>i</code> in <code>t1</code> may not be the "latest" as the
-                content in the memory is not updated. Besides, the above example is an undefined behavior in C++. So
-                there's a race condition and we need synchronization or enforcing read-write order. There are two ways:
-            </p>
-            <ol>
-                <li>
-                    Lock-based (easy, OS-level): using <code>std::mutex</code> related mutual exclusive on the critical
-                    part to let the code run in serial, i.e., when one thread acquiring the lock, other threads wait for
-                    it to be released (and begging they can acquire due to some magical scheduling)
-                </li>
-                <li>
-                    Lock-free (hard, processor-level): making sure the reading and writing operations are in the
-                    expected order. The simplest method for the above example is to use
-                    <code>std::atomic&lt;int&gt;</code> which guarantees the memory order (see <a
-                        href="https://en.cppreference.com/w/cpp/atomic/atomic">cppreference</a>)
-                </li>
-            </ol>
-            <p>
-                For general data structures in multithreading, the lock-based methods are usually easier to implement
-                and make sure its correctness.
-            </p>
+        <p>
+          you launched two threads expecting the shared variable
+          <code>i</code> to be 200, but it's not. Due to the memory order and
+          cache coherency problem, when you expecting that
+          <code>t1</code> adding 1 to the assumed latest <code>i</code>, that
+          <code>i</code> in <code>t1</code> may not be the "latest" as the
+          content in the memory is not updated. Besides, the above example is an
+          undefined behavior in C++. So there's a race condition and we need
+          synchronization or enforcing read-write order. There are two ways:
+        </p>
+        <ol>
+          <li>
+            Lock-based (easy, OS-level): using <code>std::mutex</code> related
+            mutual exclusive on the critical part to let the code run in serial,
+            i.e., when one thread acquiring the lock, other threads wait for it
+            to be released (and begging they can acquire due to some magical
+            scheduling)
+          </li>
+          <li>
+            Lock-free (hard, processor-level): making sure the reading and
+            writing operations are in the expected order. The simplest method
+            for the above example is to use
+            <code>std::atomic&lt;int&gt;</code> which guarantees the memory
+            order (see
+            <a href="https://en.cppreference.com/w/cpp/atomic/atomic"
+              >cppreference</a
+            >)
+          </li>
+        </ol>
+        <p>
+          For general data structures in multithreading, the lock-based methods
+          are usually easier to implement and make sure its correctness.
+        </p>
 
-            <h2>Thread-safe data structures</h2>
-            <p>TL; DR: More (fine-grained) locks &rightarrow; more parallelism</p>
+        <h2>Thread-safe data structures</h2>
+        <p>TL; DR: More (fine-grained) locks &rightarrow; more parallelism</p>
 
-            <p>
-                When sharing data among threads, it might be easy to synchronize data with the type of
-                <code>int</code>. However, if you have a stack or queue that want to be shared and you want to full
-                control of the parallelism of these types. You may consider building your own "thread-safe" types. For
-                these kind of big data, usually
-            </p>
-            <blockquote>
-                <p>
-                    the smaller the protected region, the fewer operations are serialized, and the greater the potential
-                    for
-                    concurrency
-                </p>
-            </blockquote>
-            <p>
-                For example, if you use the STL queue and mutex,
-            </p>
-            <pre><code>
+        <p>
+          When sharing data among threads, it might be easy to synchronize data
+          with the type of
+          <code>int</code>. However, if you have a stack or queue that want to
+          be shared and you want to full control of the parallelism of these
+          types. You may consider building your own "thread-safe" types. For
+          these kind of big data, usually
+        </p>
+        <blockquote>
+          <p>
+            the smaller the protected region, the fewer operations are
+            serialized, and the greater the potential for concurrency
+          </p>
+        </blockquote>
+        <p>For example, if you use the STL queue and mutex,</p>
+        <pre><code>
 { // thread 1
     std::lock_guard&lt;std::mutex&gt; lk(_mtx);
     queue.push(T);
@@ -139,16 +132,21 @@ t1.join(); t2.join();
     queue.pop(T);
 }
             </code></pre>
-            <p>
-                you are increasing the time of the serialization (or high contention), but actually the push and pop
-                operations won't affect
-                each other's data (e.g., head or tail). So in this section, I'll copy some of the simple classic
-                thread-safe containers in the <a href="#thread_safe_containers">appendix</a> for reference.
-            </p>
+        <p>
+          you are increasing the time of the serialization (or high contention),
+          but actually the push and pop operations won't affect each other's
+          data (e.g., head or tail). I'll copy some of the
+          simple classic thread-safe containers in the
+          <a href="#thread_safe_containers">appendix</a> for reference.
 
-            <h2 id="thread_safe_containers">Appendix: Thread-safe containers</h2>
-            <h3>Thread-safe <code>stack</code></h3>
-            <pre><code>
+          As for thread-safe queue, the <a href="https://github.com/andreiavrammsd/cpp-channel">cpp-channel</a>
+          library provides a Go-like channel in C++.
+        </p>
+
+        <h2 id="thread_safe_containers">Appendix: Thread-safe containers</h2>
+        <h3>Thread-safe <code>stack</code></h3>
+        <button class="toggleCode">Show Code</button>
+        <pre><code class="code-block collapsed">
 template &lt;typename T&gt; class Stack {
 private:
   struct Node {
@@ -188,8 +186,9 @@ public:
 }; // class Stack
             </code></pre>
 
-            <h3>Thread-safe <code>queue</code></h3>
-            <pre><code>
+        <h3>Thread-safe <code>queue</code></h3>
+        <button class="toggleCode">Show Code</button>
+        <pre><code class="code-block collapsed">
 template &lt;typename T&gt; class Queue {
 private:
   struct Node {
@@ -256,8 +255,9 @@ public:
   }
 }; // class Queue
             </code></pre>
-            <h3>Thread-safe <code>list</code></h3>
-            <pre><code>
+        <h3>Thread-safe <code>list</code></h3>
+        <button class="toggleCode">Show Code</button>
+        <pre><code class="code-block collapsed">
 template &lt;typename T&gt; class List {
   struct Node {
     std::mutex m;
@@ -325,11 +325,10 @@ public:
   }
 }; // class List
             </code></pre>
-            <h3>Thread-safe <code>map</code></h3>
+        <h3>Thread-safe <code>map</code></h3>
 
-
-
-            <pre><code>
+        <button class="toggleCode">Show Code</button>
+        <pre><code class="code-block collapsed">
   template &lt;typename Key, typename Value, typename Hash = std::hash&lt;Key&gt;&gt;
   class Map {
   private:
@@ -387,11 +386,13 @@ public:
   }; // class Map 
             </code></pre>
 
-            <p>
-                There's a version that you can use the STL's list if you don't have a thread-safe queue.
-            </p>
+        <p>
+          There's a version that you can use the STL's list if you don't have a
+          thread-safe queue.
+        </p>
 
-            <pre><code>
+        <button class="toggleCode">Show Code</button>
+        <pre><code class="code-block collapsed">
 template &lt;typename Key, typename Value, typename Hash = std::hash&lt;Key&gt;&gt;
 class _Map {
 private:
@@ -463,10 +464,85 @@ public:
   void remove_mapping(const Key &key) { get_bucket(key).remove_mapping(key); }
 }; // class _Map
             </code></pre>
-
-
-
-
-        </section>
+      </section>
     </article>
-</body>
+  </body>
+
+  <script>
+    hljs.highlightAll();
+  </script>
+  <script>
+    $(document).ready(() => {
+      // Select the link element for the Highlight.js theme
+      const themeLink = $("link[rel='stylesheet'][href*='highlight.js']");
+      // Function to update the theme based on system preference
+      function updateTheme(e) {
+        const prefersDarkScheme = e.matches;
+        if (prefersDarkScheme) {
+          themeLink.attr(
+            "href",
+            "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+          );
+        } else {
+          themeLink.attr(
+            "href",
+            "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
+          );
+        }
+      }
+      // Detect initial theme preference
+      const prefersDarkScheme = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      );
+      updateTheme(prefersDarkScheme);
+      // Listen for theme changes
+      prefersDarkScheme.addEventListener("change", updateTheme);
+
+      // Add click event listener to each toggle button
+      $(".toggleCode").click(() => {
+        // Toggle the corresponding code block
+        const codeBlock = $(this).next("pre").find("code");
+        codeBlock.toggleClass("expanded").toggleClass("collapsed");
+        // Update the button text based on the code visibility
+        if (codeBlock.hasClass("expanded")) {
+          $(this).text("Hide Code");
+        } else {
+          $(this).text("Show Code");
+        }
+      });
+    });
+  </script>
+
+  <style>
+    .hljs {
+      background-color: transparent !important; /* Makes the code block background match the body */
+    }
+
+    /* Default state for code block: collapsed */
+    .code-block.collapsed {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.1s ease;
+    }
+
+    /* Expanded state for code block */
+    .code-block.expanded {
+      max-height: 1000px; /* Set a max height to prevent infinite expansion */
+      transition: max-height 0.1s ease;
+    }
+
+    /* Style for toggle button */
+    .toggleCode {
+      display: inline-block;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #007acc; /* Adjust color to fit your design */
+      background: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      font-weight: bold;
+    }
+  </style>
+</html>

@@ -1,0 +1,11 @@
+[
+  {
+    "title": "CoNi-MPC: Cooperative Non-inertial Frame Based Model Predictive Control", 
+    "authors": ["Baozhe Zhang*", "Xinwei Chen*", "Zhehan Li", "Giovanni Beltrame", "Chao Xu", "Fei Gao", "Yanjun Cao"], 
+    "venue": "RA-L 2023 | ICRA 2024",
+    "link": "https://fast-fire.github.io/CoNi-MPC/", 
+    "image": "images/coni_mpc.gif", 
+    "year": 2023,
+    "excerpt": "Key words: UAV model in non-inertial reference frame and MPC control. This work presents a new UAV control method for cooperative multi-robot systems, focusing on leader-following, landing on moving bases, and relative motion tasks. Unlike traditional approaches, it operates directly in the target frame without motion assumptions."
+  }
+]

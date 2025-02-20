@@ -1,10 +1,18 @@
 ---
-home: true
-
-head:
-  - - link
-    - rel: stylesheet
-      href: https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css
+page: false
+title: Baozhe Zhang
+description: About me
+aside: false
 ---
 
-$\sqrt{3x-1}+(1+x)^2$
+# Me
+
+👋 Hi, I'm Baozhe Zhang (张宝哲).
+I graduated from CUHK-Shenzhen in 2024.
+I'm currently working as a research assistant and robotics engineer at FAST Lab.
+
+# Research
+
+I'm interested in motion planning, control, and reinforcement learning for robot systems aerial systems, multi-robot systems, ...
+
+<Publications />

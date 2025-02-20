@@ -1,6 +1,9 @@
 ---
 title: "Course notes: CS184 Computer Graphics"
 date: 2024-11-23
+tags: 
+    - course notes
+    - computer graphics
 ---
 
 # Course notes: CS184 Computer Graphics

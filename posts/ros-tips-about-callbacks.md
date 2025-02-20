@@ -1,6 +1,9 @@
 ---
 title: "ROS tips about callbacks"
 date: 2024-11-22
+tags: 
+    - ros
+    - robotics
 ---
 
 # ROS tips about callbacks

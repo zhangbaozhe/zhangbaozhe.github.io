@@ -1,6 +1,10 @@
 ---
 title: "Reading notes: C++ Concurrency in Action"
 date: 2025-02-11
+tags: 
+  - C++
+  - reading notes
+  - concurrency
 ---
 
 # Reading notes: C++ Concurrency in Action
@@ -546,3 +550,5 @@ public:
   void remove_mapping(const Key &key) { get_bucket(key).remove_mapping(key); }
 }; // class _Map
 ```
+
+<Comment />

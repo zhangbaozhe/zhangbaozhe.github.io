@@ -4,9 +4,8 @@ import { ref, onMounted } from "vue";
 const publications = ref([]);
 
 onMounted(async () => {
-  const response = await fetch("/publications.json"); // Adjust path if necessary
+  const response = await fetch("https://raw.githubusercontent.com/zhangbaozhe/zhangbaozhe.github.io/refs/heads/main/publications.json"); // Adjust path if necessary
   publications.value = await response.json();
-  console.log(publications.value);
 });
 </script>
 

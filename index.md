@@ -8,8 +8,8 @@ aside: false
 # Me
 
 👋 Hi, I'm Baozhe Zhang (张宝哲).
-I graduated from [CUHK-Shenzhen](https://www.cuhk.edu.cn/en) in 2024.
-I'm currently working as a research assistant and robotics engineer at [FAST Lab](http://zju-fast.com/).
+I was a research assistant and robotics engineer at [FAST Lab](http://zju-fast.com/).
+Now I'm an incoming PhD student in [CUHK-Shenzhen](https://www.cuhk.edu.cn/en).
 
 # Research
 

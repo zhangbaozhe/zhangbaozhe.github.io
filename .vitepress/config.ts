@@ -9,6 +9,9 @@ export default defineConfig({
   description: "",
   ignoreDeadLinks: true,
   cleanUrls: true,
+  markdown: {
+    math: true
+  }, 
   themeConfig: {
     posts: await getPosts(pageSize),
     nav: [

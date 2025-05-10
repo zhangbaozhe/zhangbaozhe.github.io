@@ -1,5 +1,17 @@
 [
+    
     {
+      "category": "Air-Ground Cooperation", 
+      "title": "Global-State-Free Obstacle Avoidance for Quadrotor Control in Air-Ground Cooperation", 
+      "authors": ["Baozhe Zhang*", "Xinwei Chen*", "Qingcheng Chen", "Chao Xu", "Fei Gao", "Yanjun Cao"], 
+      "venue": "RA-L 2025", 
+      "link": "https://ieeexplore.ieee.org/document/10993292", 
+      "image": "/images/coni_oa.gif", 
+      "year": 2025, 
+      "excerpt": "This work presents CoNi-OA, an obstacle-avoidance add-on to CoNi-MPC that lets a UAV cooperate with a UGV without global state estimation. A single raw LiDAR frame is converted into a modulation matrix that tweaks the quadrotor's velocity, producing collision-free trajectories inside the UGV's non-inertial frame in < 5 ms. "
+    }, 
+    {
+      "category": "Air-Ground Cooperation",
       "title": "CoNi-MPC: Cooperative Non-inertial Frame Based Model Predictive Control", 
       "authors": ["Baozhe Zhang*", "Xinwei Chen*", "Zhehan Li", "Giovanni Beltrame", "Chao Xu", "Fei Gao", "Yanjun Cao"], 
       "venue": "RA-L 2023 | ICRA 2024",
@@ -7,13 +19,6 @@
       "image": "/images/coni_mpc.gif", 
       "year": 2023,
       "excerpt": "This work presents a new UAV control method for cooperative multi-robot systems, focusing on leader-following, landing on moving bases, and relative motion tasks. Unlike traditional approaches, it operates directly in the target frame without motion assumptions."
-    }, 
-    {
-      "title": "Global-State-Free Obstacle Avoidance for Quadrotor Control in Air-Ground Cooperation", 
-      "authors": ["Baozhe Zhang*", "Xinwei Chen*", "Qingcheng Chen", "Chao Xu", "Fei Gao", "Yanjun Cao"], 
-      "venue": "RA-L 2025", 
-      "image": "/images/coni_oa.gif", 
-      "year": 2025, 
-      "excerpt": "This work presents CoNi-OA, an obstacle-avoidance add-on to CoNi-MPC that lets a UAV cooperate with a UGV without global state estimation. A single raw LiDAR frame is converted into a modulation matrix that tweaks the quadrotor's velocity, producing collision-free trajectories inside the UGV's non-inertial frame in < 5 ms. "
     }
+    
 ]

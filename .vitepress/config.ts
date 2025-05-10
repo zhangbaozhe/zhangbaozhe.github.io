@@ -17,7 +17,7 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Blog", link: "/blog"}, 
-      { text: "Category", link: "/pages/category" },
+      // { text: "Category", link: "/pages/category" },
       { text: "Archives", link: "/pages/archives" },
       { text: "Tags", link: "/pages/tags" },
     ],

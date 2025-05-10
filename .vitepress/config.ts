@@ -4,7 +4,7 @@ import { getPosts } from "./theme/serverUtils";
 const pageSize = 10;
 
 export default defineConfig({
-  title: "Baozhe",
+  title: "BAOZHE",
   base: "/",
   description: "",
   ignoreDeadLinks: true,

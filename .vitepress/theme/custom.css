@@ -38,7 +38,7 @@
     font-size: 1.5rem !important;
     letter-spacing: 1px;
     font-weight: 600 !important;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     font-family: Optima, sans-serif !important;
 }
 .title a {

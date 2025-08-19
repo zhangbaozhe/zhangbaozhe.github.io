@@ -8,8 +8,7 @@ aside: false
 # Me
 
 👋 Hi, I'm Baozhe Zhang (张宝哲).
-I'm a PhD student in [CUHK-Shenzhen](https://www.cuhk.edu.cn/en).
-I'm working at [Mondo Tech](https://github.com/Mondo-Technology) as an intern right now.
+I'm a PhD student at [CUHK-Shenzhen](https://www.cuhk.edu.cn/en).
 
 Email: email@baozhezhang.com
 

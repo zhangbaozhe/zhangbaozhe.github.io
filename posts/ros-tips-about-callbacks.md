@@ -1,6 +1,8 @@
 ---
 title: "ROS tips about callbacks"
 date: 2024-11-22
+category: robotics software
+description: Practical notes on keeping ROS callbacks responsive with separate queues, lighter handlers, and safer threading.
 tags: 
     - ros
     - robotics

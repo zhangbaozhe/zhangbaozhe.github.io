@@ -5,19 +5,19 @@
                 <a :href="withBase(article.regularPath)"> {{ article.frontMatter.title }}</a>
             </div>
         </div>
-        <p class="describe" v-html="article.frontMatter.description"></p>
+        <p v-if="article.frontMatter.description" class="describe" v-html="article.frontMatter.description"></p>
         <div class='post-info'>
             {{ article.frontMatter.date }} <span v-for="item in article.frontMatter.tags"><a :href="withBase(`/pages/tags.html?tag=${item}`)"> {{ item }}</a></span>
         </div>
     </div>
 
-    <div class="pagination">
+    <div v-if="pagesNum > 1" class="pagination">
         <a
             class="link"
             :class="{ active: pageCurrent === i }"
             v-for="i in pagesNum"
             :key="i"
-            :href="withBase(i === 1 ? '/blog' : `/page_${i}`)"
+            :href="withBase(i === 1 ? '/blog' : `/blog?page=${i}`)"
         >{{ i }}</a>
     </div>
 </template>
@@ -30,7 +30,7 @@ interface Article {
     regularPath: string
     frontMatter: {
         title: string
-        description: string
+        description?: string
         date: string
         tags: string[]
     }

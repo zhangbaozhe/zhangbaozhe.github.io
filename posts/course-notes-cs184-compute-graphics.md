@@ -1,6 +1,8 @@
 ---
 title: "Course notes: CS184 Computer Graphics"
 date: 2024-11-23
+category: computer graphics
+description: Notes and assignment links from studying computer graphics, including rasterization, mesh editing, and path tracing.
 tags: 
     - course notes
     - computer graphics

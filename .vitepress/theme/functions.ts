@@ -1,10 +1,10 @@
 type Post = {
     frontMatter: {
-        date: string
+        date?: string
         title: string
-        category: string
+        category?: string
         tags: string[]
-        description: string
+        description?: string
     }
     regularPath: string
 }

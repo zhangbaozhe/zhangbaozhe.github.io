@@ -1,6 +1,8 @@
 ---
 title: "Reading notes: C++ Concurrency in Action"
 date: 2025-02-11
+category: C++
+description: Reading notes on C++ multithreading, race conditions, synchronization, and practical concurrency patterns.
 tags: 
   - C++
   - reading notes

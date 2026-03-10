@@ -27,14 +27,13 @@ let url = location.href.split('?')[1]
 let params = new URLSearchParams(url)
 const { theme } = useData()
 const data = computed(() => initTags(theme.value.posts))
-let selectTag = ref(params.get('tag') ? params.get('tag') : '')
+const requestedTag = params.get('tag') ?? ''
+const defaultDisplayTag = requestedTag && data.value[requestedTag]
+    ? requestedTag
+    : (Object.keys(data.value)[0] ?? '')
+let selectTag = ref(defaultDisplayTag)
 const toggleTag = (tag: string) => {
     selectTag.value = tag
-}
-// choose the first key
-const defaultDisplayTag = Object.keys(data.value)[0]
-if (defaultDisplayTag) {
-    toggleTag(defaultDisplayTag)
 }
 </script>
 

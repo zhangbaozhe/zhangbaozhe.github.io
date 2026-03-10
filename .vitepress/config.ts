@@ -1,22 +1,33 @@
 import { defineConfig } from "vitepress";
 import { getPosts } from "./theme/serverUtils";
+// import mathjax3 from "markdown-it-mathjax3";
+import footnote from "markdown-it-footnote";
 
 const pageSize = 10;
 
 export default defineConfig({
   title: "BAOZHE",
   base: "/",
-  description: "",
+  description: "Baozhe Zhang's personal website on robotics, motion planning, control, and reinforcement learning.",
   ignoreDeadLinks: true,
   cleanUrls: true,
+  head: [
+    ["link", { rel: "icon", href: "/favicon.ico" }],
+    ["meta", { name: "author", content: "Baozhe Zhang" }],
+    ["meta", { name: "keywords", content: "Baozhe Zhang, robotics, motion planning, control, reinforcement learning" }],
+  ],
   markdown: {
-    math: true
-  }, 
+    math: true, 
+    config: (md) => {
+      md.use(footnote);
+    }, 
+  },
   themeConfig: {
-    posts: await getPosts(pageSize),
+    pageSize,
+    posts: await getPosts(),
     nav: [
       { text: "Home", link: "/" },
-      { text: "Blog", link: "/blog"}, 
+      { text: "Blog", link: "/blog" },
       // { text: "Category", link: "/pages/category" },
       { text: "Archives", link: "/pages/archives" },
       { text: "Tags", link: "/pages/tags" },

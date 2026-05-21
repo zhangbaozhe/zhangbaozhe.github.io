@@ -10,8 +10,8 @@ aside: false
   <h1 class="home-name">Baozhe Zhang (张宝哲)</h1>
   <p class="home-summary">
     I am a PhD student at <a href="https://www.cuhk.edu.cn/en" target="_blank" rel="noreferrer">CUHK-Shenzhen</a>,
-    advised by Prof. Yuan Gao and Prof. Tin Lun Lam. My work focuses on robot motion planning,
-    control, and learning-driven autonomy.
+    advised by <a href="https://gaoyuankidult.github.io/" target="_blank" rel="noreferrer">Prof. Yuan Gao</a> and <a href="https://sites.google.com/site/lamtinlun" target="_blank" rel="noreferrer">Prof. Tin Lun Lam</a>. My work focuses on robot motion planning,
+    control, and learning-driven autonomy. 
   </p>
   <div class="home-actions">
     <a href="mailto:email@baozhezhang.com">Email</a>
@@ -20,10 +20,7 @@ aside: false
   </div>
 </div>
 
-## Research
 
-I am interested in motion planning, control, and reinforcement learning for robot systems, especially in settings that demand reliable autonomy and strong real-time performance.
-
-## Selected Publications
+# Selected Publications
 
 <Publications />
